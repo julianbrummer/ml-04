@@ -12,14 +12,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import uni.ml.dataset.Dataset;
-import uni.ml.dataset.DatasetIndexedView;
-import uni.ml.dataset.DatasetPredicateView;
-import uni.ml.dataset.DatasetRangeView;
-import uni.ml.dataset.DatasetShuffleView;
-import uni.ml.dataset.DatasetView;
 import uni.ml.dataset.EnumAttribute;
 import uni.ml.dataset.Sampling;
 import uni.ml.dataset.Value;
+import uni.ml.dataset.view.DatasetIndexedView;
+import uni.ml.dataset.view.DatasetListView;
+import uni.ml.dataset.view.DatasetPredicateView;
+import uni.ml.dataset.view.DatasetRangeView;
+import uni.ml.dataset.view.DatasetShuffleView;
+import uni.ml.dataset.view.DatasetView;
 import uni.ml.learning.ClassificationResult;
 import uni.ml.learning.DecisionModel;
 import uni.ml.learning.DecisionTreeModel;
@@ -93,17 +94,48 @@ public class Exercise04Task03 {
 	 * @param classAttribute The target attribute.
 	 * @param model The decision model to evaluate.
 	 * @param numFolds The number of cross validation folds.
+	 * @param directory Specifies the folder to which the training and testSet created during cross validation should be saved,
+	 * or <code>null</code> to not save.
 	 * @return The mean and standard deviation of the accuracy.
 	 */
-	public static ClassificationResult stratifiedCrossValidation(DatasetView dataset, EnumAttribute<?> classAttribute, DecisionModel model, int numFolds) {
-		List<Float> accuracy = new ArrayList<>();
+	public static ClassificationResult stratifiedCrossValidation(DatasetView dataset, EnumAttribute<?> classAttribute, DecisionModel model, 
+			int numFolds, File directory) {
+		List<Float> accuracy = new ArrayList<>(); //stores the classification accuracies for each test run
 		
-		for (int i = 0; i < numFolds; i++) {
-			model.trainModel(trainCV(dataset, i, numFolds), classAttribute);
-			accuracy.add(model.testModel(testCV(dataset, i, numFolds), classAttribute));
+		// split dataset by values of classAttribute and shuffle each one
+		List<DatasetView> stratified = stratification(dataset, classAttribute);
+		for (int i = 0; i < stratified.size(); i++) {
+			stratified.set(i, shuffle(stratified.get(i)));
 		}
 		
-		return Measures.meanDev(accuracy);
+		
+		for (int i = 0; i < numFolds; i++) {
+			// from each same-classed-dataset select a training- and testset (ratio numFolds:1) according to cross validation
+			// these sets are then linked together to form the final stratified training- and testset.
+			DatasetListView trainingSet = new DatasetListView();
+			DatasetListView testSet = new DatasetListView();
+			for (int j = 0; j < stratified.size(); j++) {
+				trainingSet.append(trainCV(stratified.get(j), i, numFolds)); 
+				testSet.append(testCV(stratified.get(j), i, numFolds));
+			}
+			
+			// save sets to specified directory
+			if (directory != null) {
+				trainingSet.name("trainingSet"+i);
+				testSet.name("testSet"+i);
+				try {
+					trainingSet.saveToArff(directory);
+					testSet.saveToArff(directory);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			// train and test
+			model.trainModel(trainingSet, classAttribute);
+			accuracy.add(model.testModel(testSet, classAttribute));
+		}
+		
+		return Measures.meanDev(accuracy); // compute mean and standard deviation
 	}
 
 
@@ -115,10 +147,13 @@ public class Exercise04Task03 {
 				
 				int maxDepth = Integer.parseInt(args[1]);
 				int numFolds = Integer.parseInt(args[2]);
+				String outputPath = args.length >= 4? args[3] : "./";
 
-				ClassificationResult accuracy = stratifiedCrossValidation(dataset, dataset.lastAttribute(), new DecisionTreeModel(maxDepth), numFolds);
+				ClassificationResult accuracy = stratifiedCrossValidation(dataset, dataset.lastAttribute(), new DecisionTreeModel(maxDepth), 
+																		  numFolds, new File(outputPath));
 				
 				System.out.println("Dataset: " + dataset.name());
+				System.out.println("Number of instances: " + dataset.numInstances());
 				System.out.println("Number of Folds: " + numFolds);
 				System.out.println("MaxDepth: " + maxDepth);
 				System.out.println("Accuracy: " + accuracy);

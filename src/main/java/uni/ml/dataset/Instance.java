@@ -76,8 +76,30 @@ public class Instance {
 		return weight *= factor;
 	}
 	
+	/**
+	 * @return The number of values stored within this instance.
+	 */
+	public int numValues() {
+		return values.size();
+	}
 	
-	public String toString(Iterable<Attribute<?>> attributes) {
+	/**
+	 * Returns the ARFF string of this instance.
+	 * @return "value0, value1, ... valueN-1"
+	 */
+	public String arffString(Iterable<? extends Attribute<?>> attributes) {
+		StringBuilder b = new StringBuilder();
+		for (Attribute<?> attribute : attributes) {
+			if (hasAttribute(attribute)) {
+				b.append(value(attribute).arffString());
+			}
+			b.append(",");
+		}
+		b.deleteCharAt(b.length()-1);
+		return b.toString();
+	}
+	
+	public String toString(Iterable<? extends Attribute<?>> attributes) {
 		StringBuilder b = new StringBuilder();
 		//b.append("weight=").append(weight).append("  ");
 		for (Attribute<?> attribute : attributes) {

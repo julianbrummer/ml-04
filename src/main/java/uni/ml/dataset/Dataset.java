@@ -8,9 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
+import uni.ml.dataset.view.DatasetView;
 
 /**
  * A dataset stores the attributes (e.g. the header/column labels of a table) and
@@ -23,8 +22,6 @@ import lombok.experimental.Accessors;
 @Accessors(fluent=true)
 public class Dataset extends DatasetView {
 	
-	@Setter @Getter
-	private String name;
 	private List<EnumAttribute<?>> attributes = new ArrayList<>();
 	private List<Instance> instances = new ArrayList<>();
 	
@@ -69,7 +66,7 @@ public class Dataset extends DatasetView {
 		    if (!line.isEmpty()) {
 			    if (header) {
 					if (line.startsWith("@relation")) {
-					    name = line.split(" ")[1];
+					    name(line.split(" ")[1]);
 					} else if (line.startsWith("@attribute")) {
 					    addAttribute(parseAttribute(line));
 					} else if (line.startsWith("@data")) {

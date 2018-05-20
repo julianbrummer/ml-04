@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Accessors(fluent=true)
-@ToString(includeFieldNames = false, doNotUseGetters = true)
+@ToString(includeFieldNames = false, doNotUseGetters = true, exclude="weight")
 @EqualsAndHashCode(exclude="weight")
 public class Value<T extends Comparable<T>> implements Comparable<Value<? extends T>>, Cloneable {
 	@NonNull @Getter
@@ -44,5 +44,9 @@ public class Value<T extends Comparable<T>> implements Comparable<Value<? extend
 	@Override
 	public Value<T> clone() {
 		return new Value<T>(value, weight);
+	}
+	
+	public String arffString() {
+		return value.toString();
 	}
 }

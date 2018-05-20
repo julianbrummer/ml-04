@@ -56,11 +56,39 @@ public class EnumAttribute<T extends Comparable<T>> extends Attribute<T> impleme
 
 	@Override
 	public Iterator<Value<T>> iterator() {
-		return values.iterator();
+		return values();
 	}
 	
 	public Iterator<Value<T>> values() {
 		return values.iterator();
+	}
+	
+	/**
+	 * @return the number of allowed values.
+	 */
+	public int numValues() {
+		return values.size();
+	}
+	
+	public Value<T> value(int index) {
+		return values.get(index);
+	}
+	
+	/**
+	 * Returns the ARFF definition string of this attribute.
+	 * @return "@attribute name {value0, value1, ... valueN-1}"
+	 */
+	public String arffString() {
+		StringBuilder b = new StringBuilder();
+		b.append("@attribute " + name() + "{");
+		int n = numValues();
+		if (n > 0) {
+			for (int i = 0; i < n-1; i++) {
+				b.append(value(i).arffString() + ", ");
+			}
+			b.append(value(n-1).arffString());
+		}
+		return b.append("}").toString();
 	}
 
 }

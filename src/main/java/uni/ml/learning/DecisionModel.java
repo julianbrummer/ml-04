@@ -5,12 +5,12 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.experimental.Accessors;
-import uni.ml.dataset.DatasetIndexedView;
-import uni.ml.dataset.DatasetSplit;
-import uni.ml.dataset.DatasetView;
 import uni.ml.dataset.EnumAttribute;
 import uni.ml.dataset.Instance;
 import uni.ml.dataset.Value;
+import uni.ml.dataset.view.DatasetIndexedView;
+import uni.ml.dataset.view.DatasetSplit;
+import uni.ml.dataset.view.DatasetView;
 import uni.ml.tree.Classifier;
 
 @Accessors(fluent=true)

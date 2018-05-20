@@ -4,11 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import lombok.RequiredArgsConstructor;
-import uni.ml.dataset.DatasetPredicateView;
-import uni.ml.dataset.DatasetView;
 import uni.ml.dataset.EnumAttribute;
 import uni.ml.dataset.Instance;
 import uni.ml.dataset.Value;
+import uni.ml.dataset.view.DatasetPredicateView;
+import uni.ml.dataset.view.DatasetView;
 import uni.ml.tree.Classifier;
 import uni.ml.tree.InnerNode;
 import uni.ml.tree.Leaf;

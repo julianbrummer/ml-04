@@ -1,4 +1,4 @@
-package uni.ml.dataset;
+package uni.ml.dataset.view;
 
 import lombok.AllArgsConstructor;
 

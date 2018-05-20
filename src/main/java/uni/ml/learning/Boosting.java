@@ -2,11 +2,12 @@ package uni.ml.learning;
 
 import java.util.ArrayList;
 import java.util.List;
-import uni.ml.dataset.DatasetView;
+
 import uni.ml.dataset.EnumAttribute;
 import uni.ml.dataset.Instance;
 import uni.ml.dataset.Value;
 import uni.ml.dataset.WeightedValues;
+import uni.ml.dataset.view.DatasetView;
 import uni.ml.tree.Classifier;
 
 public class Boosting {

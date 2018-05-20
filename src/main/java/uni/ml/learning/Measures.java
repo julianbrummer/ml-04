@@ -3,11 +3,11 @@ package uni.ml.learning;
 import java.util.List;
 
 import uni.ml.dataset.Dataset;
-import uni.ml.dataset.DatasetIndexedView;
-import uni.ml.dataset.DatasetPredicateView;
-import uni.ml.dataset.DatasetView;
 import uni.ml.dataset.EnumAttribute;
 import uni.ml.dataset.Value;
+import uni.ml.dataset.view.DatasetIndexedView;
+import uni.ml.dataset.view.DatasetPredicateView;
+import uni.ml.dataset.view.DatasetView;
 
 /**
  * Provides some static methods to measure learning of decision trees.

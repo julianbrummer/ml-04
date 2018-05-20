@@ -1,10 +1,12 @@
-package uni.ml.dataset;
+package uni.ml.dataset.view;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
+import uni.ml.dataset.EnumAttribute;
+import uni.ml.dataset.Instance;
 /**
  * A view on a dataset, that only includes instances with specific (row) indices.
  * @author Julian Brummer
@@ -20,6 +22,7 @@ public class DatasetIndexedView extends DatasetView {
 	 * Decorates the given dataset(-view) with an index list to select instances.
 	 */
 	public DatasetIndexedView(DatasetView baseView, int... indices) {
+		super(baseView.name());
 		this.baseView = baseView;
 		this.indices = Arrays.stream(indices).boxed().collect(Collectors.toList());
 	}

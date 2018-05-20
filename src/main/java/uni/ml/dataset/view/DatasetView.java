@@ -1,5 +1,11 @@
-package uni.ml.dataset;
+package uni.ml.dataset.view;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -9,6 +15,15 @@ import java.util.ListIterator;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import uni.ml.dataset.Attribute;
+import uni.ml.dataset.EnumAttribute;
+import uni.ml.dataset.Instance;
+import uni.ml.dataset.Sampling;
 import uni.ml.util.Interval;
 import uni.ml.util.Interval.Type;
 
@@ -22,6 +37,9 @@ import uni.ml.util.Interval.Type;
  * @author Julian Brummer
  *
  */
+@Accessors(fluent=true)
+@RequiredArgsConstructor
+@AllArgsConstructor
 public abstract class DatasetView {
 	
 	/**
@@ -123,13 +141,16 @@ public abstract class DatasetView {
 		
 	}
 	
+	@Getter @Setter
+	private String name = "unnamed";
+	
 // access methods for attributes and instances	
 	
 	public abstract int numAttributes();
 	public abstract int numInstances();
 	public abstract EnumAttribute<?> attributeAt(int index);
 	public abstract Instance instanceAt(int index);
-	
+
 	public boolean hasAttributes() {
 		return numAttributes() > 0;
 	}
@@ -225,6 +246,39 @@ public abstract class DatasetView {
 		return sumWeights;
 	}
 	
+	/**
+	 * Saves the dataset(-view) to an ARFF file.
+	 * @param dst The destination file.
+	 * @throws IOException if file can not be created, UTF-8 encoding is not supported or an io exception occured.
+	 */
+	public void saveToArffFile(File file) throws IOException {
+		try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+	              new FileOutputStream(file), "utf-8"))) {
+			writer.write("@relation " + name);
+			writer.write("\n");
+			writer.write("\n");
+			for (EnumAttribute<?> attribute : attributes()) {
+				writer.write(attribute.arffString());
+				writer.write("\n");
+			}
+			writer.write("\n");
+			writer.write("@data\n");
+			for (Instance instance : instances()) {
+				writer.write(instance.arffString(attributes()));
+				writer.write("\n");
+			}
+		} 
+		
+	}
+	
+	/**
+	 * Saves the dataset(-view) to an ARFF file within the specified directory.
+	 * @param dir The directory to save the file to. The file will have the same name as the dataset.
+	 * @throws IOException if file can not be created, UTF-8 encoding is not supported or an io exception occured.
+	 */
+	public void saveToArff(File dir) throws IOException {
+		saveToArffFile(new File(dir, name+".arff"));		
+	}
 	
 	@Override
 	public String toString() {

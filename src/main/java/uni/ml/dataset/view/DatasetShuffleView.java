@@ -1,4 +1,6 @@
-package uni.ml.dataset;
+package uni.ml.dataset.view;
+
+import uni.ml.dataset.Sampling;
 
 public class DatasetShuffleView extends DatasetIndexedView {
 

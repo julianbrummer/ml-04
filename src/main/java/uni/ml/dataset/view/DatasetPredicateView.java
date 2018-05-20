@@ -1,8 +1,12 @@
-package uni.ml.dataset;
+package uni.ml.dataset.view;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+
+import uni.ml.dataset.Attribute;
+import uni.ml.dataset.Instance;
+import uni.ml.dataset.Value;
 
 /**
  * A view on a dataset, that only includes instances that comply with a given predicate.
