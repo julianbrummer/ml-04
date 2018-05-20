@@ -89,6 +89,47 @@ public class Exercise04Task03 {
 	}	
 	
 	/**
+	 * Creates and saves datasets for stratified cross validation.
+	 * @param dataset The full dataset.
+	 * @param classAttribute The target attribute.
+	 * @param numFolds The number of cross validation folds.
+	 * @param directory Specifies the folder to which the training and testSet created during cross validation should be saved,
+	 * or <code>null</code> to not save.
+	 */
+	public static void createSCVFiles(DatasetView dataset, EnumAttribute<?> classAttribute, int numFolds, File directory) {
+		// split dataset by values of classAttribute and shuffle each one
+		List<DatasetView> stratified = stratification(dataset, classAttribute);
+		for (int i = 0; i < stratified.size(); i++) {
+			stratified.set(i, shuffle(stratified.get(i)));
+		}
+		
+		
+		for (int i = 0; i < numFolds; i++) {
+			// from each same-classed-dataset select a training- and testset (ratio numFolds:1) according to cross validation
+			// these sets are then linked together to form the final stratified training- and testset.
+			DatasetListView trainingSet = new DatasetListView();
+			DatasetListView testSet = new DatasetListView();
+			for (int j = 0; j < stratified.size(); j++) {
+				trainingSet.append(trainCV(stratified.get(j), i, numFolds)); 
+				testSet.append(testCV(stratified.get(j), i, numFolds));
+			}
+			
+			// save sets to specified directory
+			if (directory != null) {
+				trainingSet.name("trainingSet"+i);
+				testSet.name("testSet"+i);
+				try {
+					trainingSet.saveToArff(directory);
+					testSet.saveToArff(directory);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
+	
+	/**
 	 * Evaluates a decision model using stratified cross validation.
 	 * @param dataset The full dataset.
 	 * @param classAttribute The target attribute.
@@ -144,23 +185,26 @@ public class Exercise04Task03 {
 		if (args.length > 0) {
 			try {
 				dataset.loadFromFile(new File(args[0]));
+				System.out.println("Dataset: " + dataset.name());
 				
 				int maxDepth = Integer.parseInt(args[1]);
 				int numFolds = Integer.parseInt(args[2]);
 				File outputPath = args.length >= 4? new File(args[3]) : null;
-
-				ClassificationResult accuracy = stratifiedCrossValidation(dataset, dataset.lastAttribute(), new DecisionTreeModel(maxDepth), 
-																		  numFolds, outputPath);
 				
-				System.out.println("Dataset: " + dataset.name());
-				System.out.println("Number of instances: " + dataset.numInstances());
-				System.out.println("Number of Folds: " + numFolds);
-				System.out.println("MaxDepth: " + maxDepth);
-				System.out.println("Accuracy: " + accuracy);
-			
+				if (maxDepth <= 0) { // do not run scv just create files
+					createSCVFiles(dataset, dataset.lastAttribute(), numFolds, outputPath);
+				} else {
+					ClassificationResult accuracy = stratifiedCrossValidation(dataset, dataset.lastAttribute(), 
+																			  new DecisionTreeModel(maxDepth), 
+																			  numFolds, outputPath);
+										
+					System.out.println("Number of instances: " + dataset.numInstances());
+					System.out.println("Number of Folds: " + numFolds);
+					System.out.println("MaxDepth: " + maxDepth);
+					System.out.println("Accuracy: " + accuracy);
+				}
 			} catch (IOException e) {
-				e.printStackTrace();
-				
+				e.printStackTrace();				
 			}
 		}
 		
