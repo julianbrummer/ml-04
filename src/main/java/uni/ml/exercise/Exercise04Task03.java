@@ -147,10 +147,10 @@ public class Exercise04Task03 {
 				
 				int maxDepth = Integer.parseInt(args[1]);
 				int numFolds = Integer.parseInt(args[2]);
-				String outputPath = args.length >= 4? args[3] : "./";
+				File outputPath = args.length >= 4? new File(args[3]) : null;
 
 				ClassificationResult accuracy = stratifiedCrossValidation(dataset, dataset.lastAttribute(), new DecisionTreeModel(maxDepth), 
-																		  numFolds, new File(outputPath));
+																		  numFolds, outputPath);
 				
 				System.out.println("Dataset: " + dataset.name());
 				System.out.println("Number of instances: " + dataset.numInstances());
